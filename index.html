@@ -1,0 +1,531 @@
+<style>
+  :root{
+    --ink:#17201C;
+    --ink2:#4A5A52;
+    --ink3:#8B998F;
+    --paper:#FCFDFB;
+    --bar:#E7EFE5;
+    --rule:#C8D4C6;
+    --rule2:#E0E8DE;
+    --red:#9E3527;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  }
+
+  .lg *{box-sizing:border-box;}
+  .lg{
+    font-family:var(--sans); color:var(--ink); background:var(--paper);
+    border:1px solid var(--rule); max-width:760px; margin:0 auto;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+
+  .lg-top{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:12px; flex-wrap:wrap; padding:14px 18px 12px;
+    border-bottom:2px solid var(--ink);
+  }
+  .lg-top h1{font-size:15px; font-weight:650; margin:0; letter-spacing:.04em;}
+  .lg-top .sub{
+    font-family:var(--mono); font-size:10.5px; color:var(--ink3);
+    letter-spacing:.14em; text-transform:uppercase;
+  }
+
+  .cap{display:flex; align-items:stretch; border-bottom:1px solid var(--rule); background:#fff;}
+  .cap input{
+    flex:1; min-width:0; border:0; outline:0; background:transparent;
+    font-family:var(--sans); font-size:15px; color:var(--ink); padding:16px 18px;
+  }
+  .cap input::placeholder{color:var(--ink3);}
+  .cap input:focus-visible{box-shadow:inset 3px 0 0 var(--ink);}
+  .cap button{
+    border:0; border-left:1px solid var(--rule2); background:transparent; cursor:pointer;
+    font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+    color:var(--ink2); padding:0 18px; white-space:nowrap;
+  }
+  .cap button:hover{background:var(--bar); color:var(--ink);}
+
+  .head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; padding:18px 18px 8px;}
+  .head .eye{font-family:var(--mono); font-size:10px; letter-spacing:.18em; color:var(--ink3);}
+  .head h2{font-size:14px; font-weight:650; margin:0; letter-spacing:.03em;}
+  .head .tally{
+    margin-left:auto; font-family:var(--mono); font-size:11px;
+    color:var(--ink3); font-variant-numeric:tabular-nums;
+  }
+
+  .rows{border-top:1px solid var(--rule);}
+  .row{display:flex; align-items:flex-start; gap:10px; padding:9px 18px; border-bottom:1px solid var(--rule2);}
+  .rows .row:nth-child(odd){background:var(--bar);}
+  .row .n{
+    font-family:var(--mono); font-size:11px; color:var(--ink3);
+    font-variant-numeric:tabular-nums; padding-top:3px; flex:0 0 auto;
+  }
+  .row .tx{flex:1; min-width:0; font-size:14.5px; word-break:break-word; outline:0; padding-top:1px;}
+  .row .tx:focus{box-shadow:0 1px 0 var(--ink);}
+  .row .act{display:flex; gap:4px; flex-wrap:wrap; flex:0 0 auto; align-items:center;}
+
+  .chip{
+    border:1px solid currentColor; color:var(--c); background:transparent; cursor:pointer;
+    font-family:var(--sans); font-size:10.5px; line-height:1;
+    padding:4px 7px; white-space:nowrap; opacity:.5;
+  }
+  .row:hover .chip, .row:focus-within .chip{opacity:1;}
+  .chip:hover{background:var(--c); color:#fff;}
+
+  .icon{
+    border:0; background:transparent; cursor:pointer; color:var(--ink3);
+    font-family:var(--mono); font-size:13px; line-height:1; padding:4px 5px;
+    opacity:0; transition:opacity .12s;
+  }
+  .row:hover .icon, .row:focus-within .icon{opacity:1;}
+  .icon:hover{color:var(--red);}
+  .icon.back:hover{color:var(--ink);}
+
+  .chk{
+    flex:0 0 auto; width:18px; height:18px; margin-top:2px;
+    border:1.5px solid var(--ink3); background:#fff; cursor:pointer;
+    font-family:var(--mono); font-size:12px; line-height:15px; color:var(--ink);
+    padding:0; text-align:center; border-radius:2px;
+  }
+  .chk:hover{border-color:var(--ink); background:var(--bar);}
+  .row.done .chk{border-color:var(--rule); color:var(--ink3);}
+  .row.done .tx{color:var(--ink3); text-decoration:line-through;}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex; flex-wrap:wrap; align-items:center; padding:0 18px;}
+  .tab{
+    border:0; border-bottom:2px solid transparent; background:transparent; cursor:pointer;
+    font-family:var(--sans); font-size:12.5px; color:var(--ink3);
+    padding:7px 12px 6px 0; margin-right:14px; max-width:100%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .tab .c{font-family:var(--mono); font-size:10.5px; margin-left:5px; font-variant-numeric:tabular-nums;}
+  .tab:hover{color:var(--ink2);}
+  .tab[aria-selected="true"]{color:var(--c); border-bottom-color:var(--c); font-weight:600;}
+  .tab-edit{
+    border:0; background:transparent; cursor:pointer; margin-left:auto; padding:7px 0;
+    font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--ink3);
+    text-decoration:underline; text-underline-offset:3px; white-space:nowrap;
+  }
+  .tab-edit:hover{color:var(--ink);}
+
+  /* ---------- category editor ---------- */
+  .ed{margin:6px 18px 12px; border:1px solid var(--rule); background:#fff;}
+  .ed-row{display:flex; align-items:center; gap:9px; padding:7px 10px; border-bottom:1px solid var(--rule2);}
+  .sw{
+    width:11px; height:11px; flex:0 0 auto; border-radius:2px; border:0;
+    cursor:pointer; padding:0;
+  }
+  .sw:hover{outline:2px solid var(--rule); outline-offset:1px;}
+  .ed-in{
+    flex:1; min-width:0; border:0; outline:0; background:transparent;
+    font-family:var(--sans); font-size:13.5px; color:var(--ink); padding:2px 0;
+  }
+  .ed-in:focus{box-shadow:0 1px 0 var(--ink);}
+  .ed-del{
+    border:0; background:transparent; cursor:pointer; flex:0 0 auto;
+    font-family:var(--mono); font-size:10.5px; color:var(--ink3); padding:3px 4px;
+  }
+  .ed-del:hover{color:var(--red);}
+  .ed-del.confirm{color:var(--red); font-weight:700;}
+  .ed-del:disabled{opacity:.28; cursor:not-allowed;}
+  .ed-foot{display:flex; gap:16px; align-items:center; padding:9px 10px 4px;}
+  .ed-foot button{
+    border:0; background:transparent; cursor:pointer; padding:0;
+    font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink2);
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .ed-foot button:hover{color:var(--ink);}
+  #doneAccts{margin-left:auto;}
+  .ed-note{margin:0; padding:2px 10px 9px; font-size:11px; color:var(--ink3); line-height:1.45;}
+
+  .empty{padding:20px 18px; font-size:13px; color:var(--ink3); border-bottom:1px solid var(--rule2);}
+  .empty b{color:var(--ink2); font-weight:600;}
+  .foot{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:12px 18px; border-top:2px solid var(--ink);
+    font-family:var(--mono); font-size:10.5px; color:var(--ink3); letter-spacing:.06em;
+  }
+  .foot button{
+    border:0; background:transparent; cursor:pointer; padding:0;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink3);
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .foot button:hover{color:var(--ink);}
+  .foot .st{margin-left:auto;}
+
+  :focus-visible{outline:2px solid var(--ink); outline-offset:1px;}
+
+  @media (max-width:520px){
+    .row{flex-wrap:wrap;}
+    .row .act{width:100%; padding-left:28px;}
+    .cap input{font-size:16px; padding:14px;}
+    .tab-edit{margin-left:0;}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important;} }
+</style>
+
+<div class="lg">
+  <div class="lg-top">
+    <h1>想法记账本</h1>
+    <span class="sub">Capture · Post · Review</span>
+  </div>
+
+  <div class="cap">
+    <input id="cap" type="text" autocomplete="off"
+           placeholder="想到什么就写下来，回车记一笔" aria-label="记录一个想法">
+    <button id="add">记一笔</button>
+  </div>
+
+  <section>
+    <div class="head">
+      <span class="eye">JOURNAL</span>
+      <h2>日记账</h2>
+      <span class="tally" id="jtally">—</span>
+    </div>
+    <div class="rows" id="jlist"></div>
+  </section>
+
+  <section>
+    <div class="head">
+      <span class="eye">LEDGER</span>
+      <h2>分类账</h2>
+      <span class="tally" id="ltally">—</span>
+    </div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div id="acctEditor"></div>
+    <div class="rows" id="llist"></div>
+  </section>
+
+  <div class="foot">
+    <button id="toggleDone">显示已完成</button>
+    <button id="copy">复制全部</button>
+    <button id="exportBtn">导出备份</button>
+    <button id="importBtn">导入备份</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <span class="st" id="status">加载中…</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const KEY = 'thought-ledger-v1';
+  const PALETTE = ['#1E4E5C','#7B5A17','#574A78','#4B5A53','#8A3B2E','#2F6B47','#3B4F7A','#6B4A2E'];
+  const DEFAULTS = [
+    {id:'d1', label:'工作',           color:PALETTE[0]},
+    {id:'d2', label:'学习',           color:PALETTE[1]},
+    {id:'d3', label:'生活',           color:PALETTE[2]},
+    {id:'d4', label:'以后再说',       color:PALETTE[3]}
+  ];
+
+  let state = {seq:0, items:[], accts:null};
+  let tab = null;
+  let showDone = false;
+  let editing = false;
+  let saveTimer = null;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const pad = n => String(n).padStart(3,'0');
+  const acct = id => state.accts.find(a=>a.id===id);
+  const setStatus = t => { $('status').textContent = t; };
+
+  // ---------- storage: Claude 账号存储 → 浏览器本地存储 → 内存 ----------
+  const mem = {};
+  let mode = '内存';
+  const store = {
+    async get(k){
+      if(window.storage){
+        try{ const r = await window.storage.get(k); mode='云端'; return (r && r.value) || null; }
+        catch(e){ mode='云端'; return null; }
+      }
+      try{ mode='本机'; return window.localStorage.getItem(k); }
+      catch(e){ return mem[k] || null; }
+    },
+    async set(k,v){
+      if(window.storage){ const ok = await window.storage.set(k,v); mode='云端'; return !!ok; }
+      try{ window.localStorage.setItem(k,v); mode='本机'; return true; }
+      catch(e){ mem[k]=v; mode='内存'; return false; }
+    }
+  };
+
+  async function load(){
+    try{
+      const raw = await store.get(KEY);
+      if(raw) state = JSON.parse(raw);
+    }catch(e){}
+    if(!state || typeof state !== 'object') state = {seq:0, items:[]};
+    if(!Array.isArray(state.items)) state.items = [];
+    if(!Array.isArray(state.accts) || !state.accts.length) state.accts = DEFAULTS.slice();
+    if(typeof state.seq !== 'number') state.seq = state.items.length;
+    tab = state.accts[0].id;
+    render();
+    setStatus(mode==='本机' ? '已存到本机' : (mode==='内存' ? '无法保存' : '已保存'));
+  }
+
+  function save(){
+    clearTimeout(saveTimer);
+    setStatus('保存中…');
+    saveTimer = setTimeout(async ()=>{
+      try{
+        const ok = await store.set(KEY, JSON.stringify(state));
+        setStatus(!ok ? '未能保存，本次有效' : (mode==='本机' ? '已存到本机' : '已保存'));
+      }catch(e){ setStatus('未能保存，本次有效'); }
+    }, 250);
+  }
+
+  function add(text){
+    text = (text||'').trim();
+    if(!text) return;
+    state.seq += 1;
+    state.items.unshift({
+      id:'e'+Date.now()+Math.random().toString(36).slice(2,6),
+      n:state.seq, text, acct:null, done:false, ts:Date.now()
+    });
+    save(); render();
+  }
+
+  const find = id => state.items.find(i=>i.id===id);
+
+  function chipsHTML(){
+    return state.accts.map(a =>
+      `<button class="chip" style="--c:${a.color}" data-post="${a.id}" title="过账到 ${esc(a.label)}">${esc(a.label)}</button>`
+    ).join('');
+  }
+
+  function renderJournal(){
+    const all  = state.items.filter(i=>i.acct===null);
+    const open = all.filter(i=>!i.done);
+    $('jtally').textContent = open.length ? open.length + ' 笔待处理'
+      : (all.length ? '已全部勾掉' : '已清空');
+
+    let list = showDone ? all.slice() : open;
+    list.sort((a,b)=> (a.done-b.done) || (b.ts-a.ts));
+
+    if(!list.length){
+      $('jlist').innerHTML = '<div class="empty">日记账是空的。<b>想到什么就往上面那一栏敲，回车。</b>小事直接打勾划掉，需要跟进的再过账到分类账。</div>';
+      return;
+    }
+    $('jlist').innerHTML = list.map(i => `
+      <div class="row ${i.done?'done':''}" data-id="${i.id}">
+        <button class="chk" data-check aria-label="标记完成">${i.done?'✓':''}</button>
+        <span class="n">${pad(i.n)}</span>
+        <span class="tx" contenteditable="true" data-edit>${esc(i.text)}</span>
+        <span class="act">${chipsHTML()}<button class="icon" data-del title="删除">×</button></span>
+      </div>`).join('');
+  }
+
+  function renderTabs(posted){
+    if(!acct(tab)) tab = state.accts[0].id;
+    $('tabs').innerHTML = state.accts.map(a=>{
+      const n = posted.filter(i=>i.acct===a.id && !i.done).length;
+      return `<button class="tab" role="tab" style="--c:${a.color}" data-tab="${a.id}"
+        aria-selected="${tab===a.id}">${esc(a.label)}<span class="c">${n}</span></button>`;
+    }).join('') + `<button class="tab-edit" id="editAccts">${editing?'收起':'编辑分类'}</button>`;
+  }
+
+  function renderEditor(){
+    if(!editing){ $('acctEditor').innerHTML = ''; return; }
+    const only = state.accts.length === 1;
+    $('acctEditor').innerHTML = `
+      <div class="ed">
+        ${state.accts.map(a=>`
+          <div class="ed-row">
+            <button class="sw" style="background:${a.color}" data-cycle="${a.id}" title="换个颜色"></button>
+            <input class="ed-in" value="${esc(a.label)}" data-rename="${a.id}" aria-label="分类名称">
+            <button class="ed-del" data-delacct="${a.id}" ${only?'disabled title="至少保留一个分类"':''}>删除</button>
+          </div>`).join('')}
+        <div class="ed-foot">
+          <button id="addAcct">+ 新增分类</button>
+          <button id="doneAccts">完成</button>
+        </div>
+        <p class="ed-note">改名直接在框里改，点小方块换颜色。删除分类时，里面的条目会退回日记账，不会丢。</p>
+      </div>`;
+  }
+
+  function renderLedger(){
+    const posted = state.items.filter(i=>i.acct!==null);
+    const open = posted.filter(i=>!i.done).length;
+    $('ltally').textContent = posted.length ? open + ' 项未完成 / 共 ' + posted.length : '还没有过账的条目';
+
+    renderTabs(posted);
+    renderEditor();
+
+    let list = posted.filter(i=>i.acct===tab);
+    if(!showDone) list = list.filter(i=>!i.done);
+    list.sort((a,b)=> (a.done-b.done) || (b.ts-a.ts));
+
+    if(!list.length){
+      $('llist').innerHTML = `<div class="empty">「${esc(acct(tab).label)}」下还没有条目。到日记账里点一下分类标签，就过账到这里了。</div>`;
+      return;
+    }
+    $('llist').innerHTML = list.map(i => `
+      <div class="row ${i.done?'done':''}" data-id="${i.id}">
+        <button class="chk" data-check aria-label="标记完成">${i.done?'✓':''}</button>
+        <span class="tx" contenteditable="true" data-edit>${esc(i.text)}</span>
+        <span class="act">
+          <span class="n">${pad(i.n)}</span>
+          <button class="icon back" data-unpost title="退回日记账">↩</button>
+          <button class="icon" data-del title="删除">×</button>
+        </span>
+      </div>`).join('');
+  }
+
+  function render(){ renderJournal(); renderLedger(); }
+
+  // ---------- capture ----------
+  $('add').addEventListener('click', ()=>{ add($('cap').value); $('cap').value=''; $('cap').focus(); });
+  $('cap').addEventListener('keydown', e=>{
+    if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); add(e.target.value); e.target.value=''; }
+  });
+
+  const root = document.querySelector('.lg');
+
+  // ---------- clicks ----------
+  root.addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+
+    // category management
+    if(btn.id === 'editAccts'){ editing = !editing; renderLedger(); return; }
+    if(btn.id === 'doneAccts'){ editing = false; renderLedger(); return; }
+    if(btn.id === 'addAcct'){
+      const id = 'a'+Date.now().toString(36);
+      state.accts.push({id, label:'新分类', color:PALETTE[state.accts.length % PALETTE.length]});
+      tab = id; save(); renderLedger(); renderJournal();
+      const inp = root.querySelector('[data-rename="'+id+'"]');
+      if(inp){ inp.focus(); inp.select(); }
+      return;
+    }
+    if(btn.dataset.cycle){
+      const a = acct(btn.dataset.cycle);
+      a.color = PALETTE[(PALETTE.indexOf(a.color)+1) % PALETTE.length];
+      save(); renderLedger(); renderJournal(); return;
+    }
+    if(btn.dataset.delacct){
+      const id = btn.dataset.delacct;
+      if(!btn.classList.contains('confirm')){
+        root.querySelectorAll('.ed-del.confirm').forEach(b=>{ b.classList.remove('confirm'); b.textContent='删除'; });
+        btn.classList.add('confirm'); btn.textContent='确认删除';
+        setTimeout(()=>{ if(btn.isConnected){ btn.classList.remove('confirm'); btn.textContent='删除'; } }, 4000);
+        return;
+      }
+      state.items.forEach(i=>{ if(i.acct===id){ i.acct=null; i.done=false; } });
+      state.accts = state.accts.filter(a=>a.id!==id);
+      if(tab===id) tab = state.accts[0].id;
+      save(); render(); return;
+    }
+
+    if(btn.dataset.tab){ tab = btn.dataset.tab; renderLedger(); return; }
+
+    // item actions
+    const row = e.target.closest('.row'); if(!row) return;
+    const item = find(row.dataset.id); if(!item) return;
+    if(btn.dataset.post){ item.acct = btn.dataset.post; tab = item.acct; }
+    else if(btn.hasAttribute('data-unpost')){ item.acct = null; item.done = false; }
+    else if(btn.hasAttribute('data-check')){ item.done = !item.done; }
+    else if(btn.hasAttribute('data-del')){ state.items = state.items.filter(i=>i.id!==item.id); }
+    else return;
+    save(); render();
+  });
+
+  // ---------- inline edits ----------
+  root.addEventListener('focusout', e=>{
+    const el = e.target;
+    if(!el.hasAttribute) return;
+
+    if(el.hasAttribute('data-rename')){
+      const a = acct(el.getAttribute('data-rename')); if(!a) return;
+      const v = el.value.trim();
+      if(!v){ el.value = a.label; return; }
+      if(v !== a.label){ a.label = v; save(); renderJournal(); renderTabs(state.items.filter(i=>i.acct!==null)); }
+      return;
+    }
+    if(el.hasAttribute('data-edit')){
+      const item = find(el.closest('.row').dataset.id); if(!item) return;
+      const v = el.textContent.trim();
+      if(!v){ el.textContent = item.text; return; }
+      if(v !== item.text){ item.text = v; save(); }
+    }
+  });
+
+  root.addEventListener('keydown', e=>{
+    if(e.key !== 'Enter' || e.isComposing) return;
+    if(e.target.hasAttribute && (e.target.hasAttribute('data-edit') || e.target.hasAttribute('data-rename'))){
+      e.preventDefault(); e.target.blur();
+    }
+  });
+
+  // ---------- footer ----------
+  $('toggleDone').addEventListener('click', e=>{
+    showDone = !showDone;
+    e.target.textContent = showDone ? '隐藏已完成' : '显示已完成';
+    render();
+  });
+
+  $('copy').addEventListener('click', async e=>{
+    const lines = [];
+    const inbox = state.items.filter(i=>i.acct===null);
+    if(inbox.length){
+      lines.push('【日记账】');
+      inbox.forEach(i=>lines.push(`${i.done?'[x]':'[ ]'} ${pad(i.n)}  ${i.text}`));
+      lines.push('');
+    }
+    state.accts.forEach(a=>{
+      const l = state.items.filter(i=>i.acct===a.id);
+      if(!l.length) return;
+      lines.push(`【${a.label}】`);
+      l.forEach(i=>lines.push(`${i.done?'[x]':'[ ]'} ${pad(i.n)}  ${i.text}`));
+      lines.push('');
+    });
+    const text = lines.join('\n').trim() || '（还是空的）';
+    try{ await navigator.clipboard.writeText(text); e.target.textContent='已复制'; }
+    catch(err){ e.target.textContent='复制失败'; }
+    setTimeout(()=>{ e.target.textContent='复制全部'; }, 1600);
+  });
+
+  // ---------- backup ----------
+  $('exportBtn').addEventListener('click', e=>{
+    try{
+      const blob = new Blob([JSON.stringify(state)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const d = new Date();
+      const stamp = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+      a.href = url; a.download = 'thought-ledger-' + stamp + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 2000);
+      e.target.textContent='已导出';
+    }catch(err){ e.target.textContent='导出失败'; }
+    setTimeout(()=>{ e.target.textContent='导出备份'; }, 1600);
+  });
+
+  $('importBtn').addEventListener('click', ()=> $('importFile').click());
+  $('importFile').addEventListener('change', e=>{
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const inc = JSON.parse(r.result);
+        if(!inc || !Array.isArray(inc.items)) throw 0;
+        const haveA = new Set(state.accts.map(a=>a.id));
+        (inc.accts||[]).forEach(a=>{ if(!haveA.has(a.id)){ state.accts.push(a); haveA.add(a.id); } });
+        const haveI = new Set(state.items.map(i=>i.id));
+        let added = 0;
+        inc.items.forEach(i=>{
+          if(haveI.has(i.id)) return;
+          if(i.acct && !haveA.has(i.acct)) i.acct = null;
+          state.items.push(i); added++;
+        });
+        state.seq = Math.max(state.seq||0, inc.seq||0);
+        state.items.sort((a,b)=>b.ts-a.ts);
+        save(); render();
+        setStatus(added ? ('已合并 ' + added + ' 条') : '没有新条目');
+      }catch(err){ setStatus('文件读不出来'); }
+      e.target.value = '';
+    };
+    r.readAsText(f);
+  });
+
+  load();
+  $('cap').focus();
+})();
+</script>
