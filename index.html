@@ -64,7 +64,7 @@
     font-family:var(--sans); font-size:16.5px; color:var(--ink); padding:20px 18px;
   }
   .cap input::placeholder{color:var(--ink3);}
-  .cap input:focus-visible{box-shadow:inset 3px 0 0 var(--ink);}
+  .cap input:focus-visible{outline:none;}
   .cap button{
     border:0; border-left:1px solid var(--rule2); background:transparent; cursor:pointer;
     font-family:var(--sans); font-size:13px; font-weight:600; letter-spacing:.06em;
@@ -118,20 +118,23 @@
   .row.done .tx{color:var(--ink3); text-decoration:line-through;}
 
   /* ---------- tabs ---------- */
-  .tabs{display:flex; flex-wrap:wrap; align-items:center; padding:0 18px;}
+  .tabs{
+    display:flex; flex-wrap:nowrap; align-items:center; padding:0 18px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
   .tab{
     border:0; border-bottom:2px solid transparent; background:transparent; cursor:pointer;
     font-family:var(--sans); font-size:12.5px; color:var(--ink3);
-    padding:7px 12px 6px 0; margin-right:14px; max-width:100%;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    padding:7px 12px 6px 0; margin-right:14px; flex:0 0 auto; white-space:nowrap;
   }
   .tab .c{font-family:var(--mono); font-size:10.5px; margin-left:5px; font-variant-numeric:tabular-nums;}
   .tab:hover{color:var(--ink2);}
   .tab[aria-selected="true"]{color:var(--c); border-bottom-color:var(--c); font-weight:600;}
   .tab-edit{
-    border:0; background:transparent; cursor:pointer; margin-left:auto; padding:7px 0;
+    border:0; background:transparent; cursor:pointer; margin-left:auto; padding:7px 0 6px 4px;
     font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--ink3);
-    text-decoration:underline; text-underline-offset:3px; white-space:nowrap;
+    text-decoration:underline; text-underline-offset:3px; white-space:nowrap; flex:0 0 auto;
   }
   .tab-edit:hover{color:var(--ink);}
 
@@ -186,17 +189,17 @@
 
   .empty{padding:22px 18px; border-bottom:1px solid var(--rule2);}
   .foot{
-    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    display:flex; align-items:center; gap:15px; flex-wrap:nowrap;
     padding:14px 18px 12px;
     font-family:var(--mono); font-size:10.5px; color:var(--ink3); letter-spacing:.06em;
   }
   .foot button{
     border:0; background:transparent; cursor:pointer; padding:0;
     font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink3);
-    text-decoration:underline; text-underline-offset:3px;
+    text-decoration:underline; text-underline-offset:3px; white-space:nowrap; flex:0 0 auto;
   }
   .foot button:hover{color:var(--ink);}
-  .foot .st{margin-left:auto;}
+  .foot .st{margin-left:auto; white-space:nowrap; flex:0 0 auto;}
 
   :focus-visible{outline:2px solid var(--ink); outline-offset:1px;}
 
@@ -205,7 +208,6 @@
     .row{flex-wrap:wrap;}
     .row .act{width:100%; padding-left:28px;}
     .cap input{font-size:16px; padding:14px;}
-    .tab-edit{margin-left:0;}
   }
   @media (prefers-reduced-motion:reduce){
     *{transition:none !important; animation:none !important;}
@@ -235,7 +237,7 @@
 
   <div class="cap">
     <input id="cap" type="text" autocomplete="off"
-           placeholder="Write down whatever comes to mind, press enter" aria-label="Add a thought">
+           placeholder="What's on your mind?" aria-label="Add a thought">
     <button id="add">Add</button>
   </div>
 
@@ -259,7 +261,7 @@
 
   <div class="foot">
     <button id="toggleDone">Show done</button>
-    <button id="copy">Copy all</button>
+    <button id="copy">Copy</button>
     <button id="exportBtn">Export</button>
     <button id="importBtn">Import</button>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -327,7 +329,7 @@
     if(typeof state.seq !== 'number') state.seq = state.items.length;
     tab = state.accts[0].id;
     render();
-    setStatus(mode==='local' ? 'Saved locally' : (mode==='memory' ? "Can't save" : 'Saved'));
+    setStatus(mode==='memory' ? "Can't save" : 'Saved');
   }
 
   function save(){
@@ -336,7 +338,7 @@
     saveTimer = setTimeout(async ()=>{
       try{
         const ok = await store.set(KEY, JSON.stringify(state));
-        setStatus(!ok ? 'Not saved' : (mode==='local' ? 'Saved locally' : 'Saved'));
+        setStatus(ok ? 'Saved' : 'Not saved');
       }catch(e){ setStatus('Not saved'); }
     }, 250);
   }
@@ -393,7 +395,7 @@
       const n = posted.filter(i=>i.acct===a.id && !i.done).length;
       return `<button class="tab" role="tab" style="--c:${col(a)}" data-tab="${a.id}"
         aria-selected="${tab===a.id}">${esc(a.label)}<span class="c">${n}</span></button>`;
-    }).join('') + `<button class="tab-edit" id="editAccts">${editing?'Close':'Edit categories'}</button>`;
+    }).join('') + `<button class="tab-edit" id="editAccts">${editing?'Close':'Edit'}</button>`;
   }
 
   function renderEditor(){
@@ -557,7 +559,7 @@
     const text = lines.join('\n').trim() || '(empty)';
     try{ await navigator.clipboard.writeText(text); e.target.textContent='Copied'; }
     catch(err){ e.target.textContent='Copy failed'; }
-    setTimeout(()=>{ e.target.textContent='Copy all'; }, 1600);
+    setTimeout(()=>{ e.target.textContent='Copy'; }, 1600);
   });
 
   // ---------- drag to reorder (mouse + touch) ----------
@@ -639,7 +641,7 @@
         state.items.sort((a,b)=>b.ts-a.ts);
         save(); render();
         setStatus(added ? ('Merged ' + added) : 'Nothing new');
-      }catch(err){ setStatus("Couldn't read file"); }
+      }catch(err){ setStatus('Bad file'); }
       e.target.value = '';
     };
     r.readAsText(f);
